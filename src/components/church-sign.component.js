@@ -33,6 +33,8 @@ export default class CreateTodo extends Component {
             color_r: 200,
             color_g: 200,
             color_b: 200,
+            submitting: false,
+            currentCommand: '',
         }
     }
 
@@ -89,7 +91,7 @@ export default class CreateTodo extends Component {
         console.log('TODO: sending brightness')
         api.restCall({
             key: "setBright",
-            value: this.state.maxBrightness,
+            value: this.state.brightness,
         })
     }
 
@@ -97,35 +99,62 @@ export default class CreateTodo extends Component {
         console.log('TODO: sending text')
     }
 
-    onSubmit = (e) => {
+    onSubmit = async (e) => {
         console.log('submitting to sign')
-        // this.pushToSign('a', '1')
-        // this.pushToSign('a', '1')
-        // this.pushToSign('a', '1')
-        api.restCall({
-            key: 'a',
-            value: '1',
-        })
-        api.restCall({
-            key: 'a',
-            value: '1',
-        })
-        api.restCall({
-            key: 'a',
-            value: '1',
-        })
-        // let messages = [
-        //     ['a', '1'],
-        //     ['b', '2'],
-        //     ['c', '3']
-        // ]
+        const {
+            text_size,
+            text_row_1,
+            text_row_2,
+            text_row_3,
+            text_row_4,
+            brightness,
+            color_r,
+            color_g,
+            color_b,
+        } = this.state;
+        let command
 
-        // let count = 0
-        // while (count < messages.length) {
-        //     // debugger
-        //     this.pushToSign(messages[count][0], messages[count][1]);
-        //     count++
-        // }
+        this.setState({
+            submitting: true,
+        })
+
+        // Commands
+        const messages = []
+        // messages.push('"command": "clearall"'); // Sending clear all
+        // messages.push(`"setBright": ${brightnessMax}`); // Sending Brightness
+        // messages.push(`"maxBright": ${brightnessMax}`); // Sending Max Brightness
+        // messages.push(`"minBright": ${brightnessMin}`); // Sending Min Brightness
+        messages.push(`{"color": [${color_r}, ${color_g}, ${color_g}]}`); // Sending color
+        messages.push('{"cursor": [0,1]}'); // Moving the cursor to the row 1
+
+        // Larger Font
+        if (text_size === 'large') {
+            messages.push(`{"width": "0", "fontsize": "2", "text": "${text_row_1}"}`); // Entering row 1
+            messages.push('{"cursor": [0, 24]}'); // Moving the cursor to the row 2
+            messages.push(`{"width": "0", "fontsize": "2", "text": "${text_row_2}"}`); // Entering row 2
+        } else {
+            messages.push(`{"width": "0", "fontsize": "1", "text": "${text_row_1}"}`); // Entering row 1
+            messages.push('{"cursor": [0, 10]}'); // Moving the cursor to the row 2
+            messages.push(`{"width": "0", "fontsize": "1", "text": "${text_row_2}"}`); // Entering row 2
+            messages.push('{"cursor": [0, 20]}'); // Moving the cursor to the row 3
+            messages.push(`{"width": "0", "fontsize": "1", "text": "${text_row_3}"}`); // Entering row 3
+            messages.push('{"cursor": [0, 30]}'); // Moving the cursor to the row 4
+            messages.push(`{"width": "0", "fontsize": "1", "text": "${text_row_4}"}`); // Entering row 4
+        }
+
+        let index = 0;
+        while (index < messages.length) {
+            console.log('message: ', messages[index]);
+            this.setState({
+                currentCommand: JSON.stringify(messages[index])
+            })
+            await api.restCall(messages[index]);
+            index++;
+        }
+
+        this.setState({
+            submitting: false,
+        })
     }
 
     render() {
@@ -136,12 +165,14 @@ export default class CreateTodo extends Component {
             text_row_2,
             text_row_3,
             text_row_4,
-            maxBrightness,
-            minBrightness,
+            // maxBrightness,
+            // minBrightness,
             brightness,
             color_r,
             color_g,
             color_b,
+            submitting,
+            currentCommand,
         } = this.state;
 
         return (
@@ -250,16 +281,25 @@ export default class CreateTodo extends Component {
                             </InputGroup>
                         </Col >
                         <Col xs={4}>
-                            <Button variant="secondary">Send Brightness</Button>
+                            <Button variant="secondary" onClick={this.sendBrightness}>Send Brightness</Button>
                         </Col>
                     </Row>
                     <h4>Commands</h4>
                     <Row>
                         <Col>
-                            <Button variant="secondary" onClick={this.clearScreen}>Clear Screen</Button>{' '}
-                            <Button variant="secondary" onClick={this.sendText}>Send Text</Button>
+                            <Button disabled={submitting} variant="secondary" onClick={this.clearScreen}>Clear Screen</Button>{' '}
+                            <Button disabled={submitting} variant="secondary" onClick={this.sendText}>Send Text</Button>{' '}
+                            <Button disabled={submitting} variant="secondary" onClick={this.onSubmit}>Submit</Button>
                         </Col>
                     </Row>
+                    {submitting &&
+                        <Row>
+                            <Col>
+                                <h4>Progress:</h4>
+                                <h5>{currentCommand}</h5>
+                            </Col>
+                        </Row>
+                    }
                 </Container>
             </div>
         )
