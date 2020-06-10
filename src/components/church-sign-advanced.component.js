@@ -213,7 +213,7 @@ export default class CreateTodo extends Component {
                     <Row>
                         <Col>
                             <h1>
-                                Basic
+                                Advanced
                             </h1>
                         </Col>
                     </Row>
@@ -256,36 +256,6 @@ export default class CreateTodo extends Component {
                             </InputGroup>
                         </Col>
                     </Row>
-                    {text_size === 'small' &&
-                        <Row>
-                            <Col>
-                                <InputGroup className="mb-3">
-                                    <FormControl
-                                        placeholder="text 3"
-                                        aria-label="text 3"
-                                        aria-describedby="text 3"
-                                        value={text_row_3}
-                                        onChange={this.onChangeText3}
-                                    />
-                                </InputGroup>
-                            </Col>
-                        </Row>
-                    }
-                    {text_size === 'small' &&
-                    <Row>
-                        <Col>
-                            <InputGroup className="mb-3">
-                                <FormControl
-                                    placeholder="text 4"
-                                    aria-label="text 4"
-                                    aria-describedby="text 4"
-                                    value={text_row_4}
-                                    onChange={this.onChangeText4}
-                                />
-                            </InputGroup>
-                        </Col>
-                    </Row>
-                    }
                     <h4>Color</h4>
                     <Row>
                         <Col>
