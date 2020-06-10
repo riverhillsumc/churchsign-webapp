@@ -33,14 +33,12 @@ export default class CreateTodo extends Component {
             color_r: 200,
             color_g: 200,
             color_b: 200,
-            submitting: false,
             currentCommand: '',
         }
     }
 
-    clearScreen = (e) => {
-        console.log('TODO: clearing screen')
-        // this.pushToSign("command", "clearall")
+    clearScreen = async (e) => {
+        await api.restCall('{"command": "clearall"}');
     }
 
     onChangeTextSize = (e) => {
@@ -87,12 +85,46 @@ export default class CreateTodo extends Component {
         })
     }
 
-    sendBrightness = (e) => {
-        console.log('TODO: sending brightness')
-        api.restCall({
-            key: "setBright",
-            value: this.state.brightness,
+    onChangeMinBrightness = (e) => {
+        this.setState({
+            minBrightness: e.target.value,
         })
+    }
+
+    onChangeMaxBrightness = (e) => {
+        this.setState({
+            maxBrightness: e.target.value,
+        })
+    }
+
+    sendBrightness = async (e) => {
+        const { brightness } = this.state;
+        const command = `{"setBright": ${brightness}}`;
+        await this.setCommand(command);
+        await api.restCall(command);
+        await this.setCommand('');
+    }
+
+    sendMinBrightness = async (e) => {
+        const { minBrightness } = this.state;
+        const command = `{"minBright": ${minBrightness}}`;
+        await this.setCommand(command);
+        await api.restCall(command);
+        await this.setCommand('');
+    }
+
+    sendMaxBrightness = async (e) => {
+        const { maxBrightness } = this.state;
+        const command = `{"maxBright": ${maxBrightness}}`;
+        await this.setCommand(command);
+        await api.restCall(command);
+        await this.setCommand('');
+    }
+
+    setCommand = (command) => {
+        this.setState({
+            currentCommand: command,
+        });
     }
 
     sendText = (e) => {
@@ -145,16 +177,12 @@ export default class CreateTodo extends Component {
         let index = 0;
         while (index < messages.length) {
             console.log('message: ', messages[index]);
-            this.setState({
-                currentCommand: JSON.stringify(messages[index])
-            })
+            await this.setCommand(messages[index]);
             await api.restCall(messages[index]);
             index++;
         }
 
-        this.setState({
-            submitting: false,
-        })
+        await this.setCommand('');
     }
 
     render() {
@@ -165,15 +193,16 @@ export default class CreateTodo extends Component {
             text_row_2,
             text_row_3,
             text_row_4,
-            // maxBrightness,
-            // minBrightness,
+            maxBrightness,
+            minBrightness,
             brightness,
             color_r,
             color_g,
             color_b,
-            submitting,
             currentCommand,
         } = this.state;
+
+        const submitting = !!currentCommand;
 
         return (
             <div style={{ marginTop: 10 }}>
@@ -282,6 +311,38 @@ export default class CreateTodo extends Component {
                         </Col >
                         <Col xs={4}>
                             <Button variant="secondary" onClick={this.sendBrightness}>Send Brightness</Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={4}>
+                            <InputGroup className="mb-3">
+                                <FormControl
+                                    placeholder=""
+                                    aria-label=""
+                                    aria-describedby=""
+                                    value={minBrightness}
+                                    onChange={this.onChangeMinBrightness}
+                                />
+                            </InputGroup>
+                        </Col >
+                        <Col xs={4}>
+                            <Button variant="secondary" onClick={this.sendMinBrightness}>Send Min Brightness</Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={4}>
+                            <InputGroup className="mb-3">
+                                <FormControl
+                                    placeholder=""
+                                    aria-label=""
+                                    aria-describedby=""
+                                    value={maxBrightness}
+                                    onChange={this.onChangeMaxBrightness}
+                                />
+                            </InputGroup>
+                        </Col >
+                        <Col xs={4}>
+                            <Button variant="secondary" onClick={this.sendMaxBrightness}>Send Max Brightness</Button>
                         </Col>
                     </Row>
                     <h4>Commands</h4>
