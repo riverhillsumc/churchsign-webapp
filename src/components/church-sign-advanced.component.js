@@ -22,6 +22,7 @@ export default class CreateTodo extends Component {
         super(props);
 
         this.state = {
+            pythonServerLocation: 'http://localhost:4000',
             text_size: 'large',
             text_row_1: '',
             text_row_2: '',
@@ -37,10 +38,19 @@ export default class CreateTodo extends Component {
         }
     }
 
+    onChangePythonServerLocation = (e) => {
+        this.setState({
+            pythonServerLocation: e.target.value,
+        })
+    }
+
     clearScreen = async (e) => {
+        const {
+            pythonServerLocation,
+        } = this.state;
         const command = '{"command": "clearall"}';
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
@@ -100,27 +110,49 @@ export default class CreateTodo extends Component {
         })
     }
 
+    sendColor = async (e) => {
+        const {
+            pythonServerLocation,
+            color_r,
+            color_g,
+            color_b,
+        } = this.state;
+        const command = `{"color": [${color_r}, ${color_g}, ${color_g}]}`;
+        await this.setCommand(command);
+        await api.restCall(pythonServerLocation, command);
+        await this.setCommand('');
+    }
+
     sendBrightness = async (e) => {
-        const { brightness } = this.state;
+        const {
+            pythonServerLocation,
+            brightness,
+        } = this.state;
         const command = `{"setBright": ${brightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
     sendMinBrightness = async (e) => {
-        const { minBrightness } = this.state;
+        const {
+            pythonServerLocation,
+            minBrightness,
+        } = this.state;
         const command = `{"minBright": ${minBrightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
     sendMaxBrightness = async (e) => {
-        const { maxBrightness } = this.state;
+        const {
+            pythonServerLocation,
+            maxBrightness
+        } = this.state;
         const command = `{"maxBright": ${maxBrightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
@@ -137,6 +169,7 @@ export default class CreateTodo extends Component {
     onSubmit = async (e) => {
         console.log('submitting to sign')
         const {
+            pythonServerLocation,
             text_size,
             text_row_1,
             text_row_2,
@@ -181,7 +214,7 @@ export default class CreateTodo extends Component {
         while (index < messages.length) {
             console.log('message: ', messages[index]);
             await this.setCommand(messages[index]);
-            await api.restCall(messages[index]);
+            await api.restCall(pythonServerLocation, messages[index]);
             index++;
         }
 
@@ -191,6 +224,7 @@ export default class CreateTodo extends Component {
     render() {
         // console.log('rendering')
         const {
+            pythonServerLocation,
             text_size,
             text_row_1,
             text_row_2,
@@ -215,6 +249,18 @@ export default class CreateTodo extends Component {
                             <h1>
                                 Advanced
                             </h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            Sign Location
+                            <FormControl
+                                placeholder="text 1"
+                                aria-label="text 1"
+                                aria-describedby="text 1"
+                                value={pythonServerLocation}
+                                onChange={this.onChangePythonServerLocation}
+                            />
                         </Col>
                     </Row>
                     <h3>Text</h3>
@@ -243,22 +289,9 @@ export default class CreateTodo extends Component {
                             </InputGroup>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col>
-                            <InputGroup className="mb-3">
-                                <FormControl
-                                    placeholder="text 2"
-                                    aria-label="text 2"
-                                    aria-describedby="text 2"
-                                    value={text_row_2}
-                                    onChange={this.onChangeText2}
-                                />
-                            </InputGroup>
-                        </Col>
-                    </Row>
                     <h4>Color</h4>
                     <Row>
-                        <Col>
+                        <Col xs={4}>
                             <ChromePicker
                                 color={{
                                     r: color_r,
@@ -267,6 +300,9 @@ export default class CreateTodo extends Component {
                                 }}
                                 onChange={this.onChangeColor}
                             />
+                        </Col>
+                        <Col xs={4}>
+                            <Button variant="secondary" onClick={this.sendColor}>Send Color</Button>
                         </Col>
                     </Row>
                     <h4>Brightness</h4>
@@ -323,7 +359,6 @@ export default class CreateTodo extends Component {
                         <Col>
                             <Button disabled={submitting} variant="secondary" onClick={this.clearScreen}>Clear Screen</Button>{' '}
                             <Button disabled={submitting} variant="secondary" onClick={this.sendText}>Send Text</Button>{' '}
-                            <Button disabled={submitting} variant="secondary" onClick={this.onSubmit}>Submit</Button>
                         </Col>
                     </Row>
                     {submitting &&

@@ -19,7 +19,7 @@ const sleep = (milliseconds) => {
  *  }
  *
 */
-exports.restCall = async (params) => {
+exports.restCall = async (serverLocation = 'localhost', params) => {
     let jsonString = params;
     console.log(jsonString);
     let json = JSON.parse(jsonString);
@@ -33,7 +33,7 @@ exports.restCall = async (params) => {
         }
     };
 
-    await axios.post(SERVER_LOCATION, body, config)
+    await axios.post(serverLocation, body, config)
         .then(function (response) {
             // handle success
             console.log(response);

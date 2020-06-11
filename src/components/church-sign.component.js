@@ -22,6 +22,7 @@ export default class CreateTodo extends Component {
         super(props);
 
         this.state = {
+            pythonServerLocation: 'http://localhost:4000',
             text_size: 'large',
             text_row_1: '',
             text_row_2: '',
@@ -37,10 +38,19 @@ export default class CreateTodo extends Component {
         }
     }
 
+    onChangePythonServerLocation = (e) => {
+        this.setState({
+            pythonServerLocation: e.target.value,
+        })
+    }
+
     clearScreen = async (e) => {
+        const {
+            pythonServerLocation,
+        } = this.state;
         const command = '{"command": "clearall"}';
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
@@ -101,26 +111,35 @@ export default class CreateTodo extends Component {
     }
 
     sendBrightness = async (e) => {
-        const { brightness } = this.state;
+        const {
+            pythonServerLocation,
+            brightness,
+        } = this.state;
         const command = `{"setBright": ${brightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
     sendMinBrightness = async (e) => {
-        const { minBrightness } = this.state;
+        const {
+            pythonServerLocation,
+            minBrightness,
+        } = this.state;
         const command = `{"minBright": ${minBrightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
     sendMaxBrightness = async (e) => {
-        const { maxBrightness } = this.state;
+        const {
+            pythonServerLocation,
+            maxBrightness,
+        } = this.state;
         const command = `{"maxBright": ${maxBrightness}}`;
         await this.setCommand(command);
-        await api.restCall(command);
+        await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
     }
 
@@ -137,6 +156,7 @@ export default class CreateTodo extends Component {
     onSubmit = async (e) => {
         console.log('submitting to sign')
         const {
+            pythonServerLocation,
             text_size,
             text_row_1,
             text_row_2,
@@ -181,7 +201,7 @@ export default class CreateTodo extends Component {
         while (index < messages.length) {
             console.log('message: ', messages[index]);
             await this.setCommand(messages[index]);
-            await api.restCall(messages[index]);
+            await api.restCall(pythonServerLocation, messages[index]);
             index++;
         }
 
@@ -191,6 +211,7 @@ export default class CreateTodo extends Component {
     render() {
         // console.log('rendering')
         const {
+            pythonServerLocation,
             text_size,
             text_row_1,
             text_row_2,
@@ -215,6 +236,18 @@ export default class CreateTodo extends Component {
                             <h1>
                                 Basic
                             </h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            Sign Location
+                            <FormControl
+                                placeholder="text 1"
+                                aria-label="text 1"
+                                aria-describedby="text 1"
+                                value={pythonServerLocation}
+                                onChange={this.onChangePythonServerLocation}
+                            />
                         </Col>
                     </Row>
                     <h3>Text</h3>
