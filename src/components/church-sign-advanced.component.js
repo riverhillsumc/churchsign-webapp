@@ -34,6 +34,8 @@ export default class CreateTodo extends Component {
             color_r: 200,
             color_g: 200,
             color_b: 200,
+            cursor_x: 0,
+            cursor_y: 0,
             currentCommand: '',
         }
     }
@@ -110,6 +112,30 @@ export default class CreateTodo extends Component {
         })
     }
 
+    onChangeCursorX = (e) => {
+        this.setState({
+            cursor_x: e.target.value,
+        })
+    }
+
+    onChangeCursorY = (e) => {
+        this.setState({
+            cursor_y: e.target.value,
+        })
+    }
+
+    sendCursor = async (e) => {
+        const {
+            pythonServerLocation,
+            cursor_x,
+            cursor_y,
+        } = this.state;
+        const command = `{"cursor": [${cursor_x}, ${cursor_y}]}`;
+        await this.setCommand(command);
+        await api.restCall(pythonServerLocation, command);
+        await this.setCommand('');
+    }
+
     sendColor = async (e) => {
         const {
             pythonServerLocation,
@@ -117,7 +143,7 @@ export default class CreateTodo extends Component {
             color_g,
             color_b,
         } = this.state;
-        const command = `{"color": [${color_r}, ${color_g}, ${color_g}]}`;
+        const command = `{"color": [${color_r}, ${color_g}, ${color_b}]}`;
         await this.setCommand(command);
         await api.restCall(pythonServerLocation, command);
         await this.setCommand('');
@@ -192,7 +218,7 @@ export default class CreateTodo extends Component {
         // messages.push(`"setBright": ${brightnessMax}`); // Sending Brightness
         // messages.push(`"maxBright": ${brightnessMax}`); // Sending Max Brightness
         // messages.push(`"minBright": ${brightnessMin}`); // Sending Min Brightness
-        messages.push(`{"color": [${color_r}, ${color_g}, ${color_g}]}`); // Sending color
+        messages.push(`{"color": [${color_r}, ${color_g}, ${color_b}]}`); // Sending color
         messages.push('{"cursor": [0,1]}'); // Moving the cursor to the row 1
 
         // Larger Font
@@ -236,6 +262,8 @@ export default class CreateTodo extends Component {
             color_r,
             color_g,
             color_b,
+            cursor_x,
+            cursor_y,
             currentCommand,
         } = this.state;
 
@@ -303,6 +331,32 @@ export default class CreateTodo extends Component {
                         </Col>
                         <Col xs={4}>
                             <Button variant="secondary" onClick={this.sendColor}>Send Color</Button>
+                        </Col>
+                    </Row>
+                    <h4>Cursor</h4>
+                    <Row>
+                        <Col xs={4}>
+                            <InputGroup className="mb-3">
+                                <h5>X</h5>
+                                <FormControl
+                                    placeholder=""
+                                    aria-label=""
+                                    aria-describedby=""
+                                    value={cursor_x}
+                                    onChange={this.onChangeCursorX}
+                                    />
+                                <h5>Y</h5>
+                                <FormControl
+                                    placeholder=""
+                                    aria-label=""
+                                    aria-describedby=""
+                                    value={cursor_y}
+                                    onChange={this.onChangeCursorY}
+                                />
+                            </InputGroup>
+                        </Col >
+                        <Col xs={4}>
+                            <Button variant="secondary" onClick={this.sendCursor}>Send Cursor</Button>
                         </Col>
                     </Row>
                     <h4>Brightness</h4>
