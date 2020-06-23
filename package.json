@@ -25,7 +25,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "mock-church-server": "node src/api/mock-church-server"
+    "mock_church_server": "node src/api/mock-church-server",
+    "webapp_server": "node server.js"
   },
   "eslintConfig": {
     "extends": "react-app"

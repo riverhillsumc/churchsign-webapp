@@ -19,17 +19,10 @@ const sleep = (milliseconds) => {
  *  }
  *
 */
-exports.restCall = async (serverLocation = 'localhost', params) => {
-    let jsonString = params;
-    console.log(jsonString);
-    let json = JSON.parse(jsonString);
-    let body = querystring['stringify'](json);
-
-    console.log('body: ', body)
-    // debugger
-    let config = {
+exports.restCall = async (serverLocation = 'localhost', body, sleepTime = 100) => {
+    const config = {
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         }
     };
 
@@ -44,7 +37,6 @@ exports.restCall = async (serverLocation = 'localhost', params) => {
         })
         .finally(function () {
             // always executed
-            console.log('about to sleep for 3000 mil')
-            sleep(3000);
+            sleep(sleepTime);
         });
 }
